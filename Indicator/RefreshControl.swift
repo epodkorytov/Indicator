@@ -5,14 +5,26 @@
 
 import UIKit
 
-class RefreshControl: UIRefreshControl {
+public class RefreshControl: UIRefreshControl {
     private let indicator: Indicator
     
-    var style: IndicatorStyleProtocol
+    public var style: IndicatorStyleProtocol
     
-    var pullToRefresh: (() -> Void)?
+    public var pullToRefresh: (() -> Void)?
     
-    init(_ style: IndicatorStyleProtocol? = nil) {
+    private override init() {
+        self.style = IndicatorStyleDefault()
+        indicator = Indicator(style: self.style)
+        
+        super.init()
+        
+        tintColor = .clear
+        addSubview(indicator)
+        
+        addTarget(self, action: #selector(self.handleRefresh(_:)), for: UIControlEvents.valueChanged)
+    }
+    
+    public init(_ style: IndicatorStyleProtocol? = nil) {
         if let style = style {
             self.style = style
         } else {
@@ -28,11 +40,11 @@ class RefreshControl: UIRefreshControl {
         addTarget(self, action: #selector(self.handleRefresh(_:)), for: UIControlEvents.valueChanged)
     }
     
-    required init?(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func layoutSubviews() {
+    override public func layoutSubviews() {
         super.layoutSubviews()
         
         indicator.center = CGPoint(x: frame.width * 0.5, y: frame.height * 0.5)
@@ -43,7 +55,7 @@ class RefreshControl: UIRefreshControl {
         pullToRefresh?()
     }
     
-    override func endRefreshing() {
+    override public func endRefreshing() {
         super.endRefreshing()
         indicator.stopAnimating()
     }
